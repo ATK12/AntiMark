@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AntiMark 控制台</title>
+<style>
+body{font-family:system-ui,sans-serif;background:#0f1115;color:#e6e6e6;margin:0;padding:16px;max-width:720px;margin:0 auto}
+h1{font-size:20px;margin:8px 0}
+.card{background:#1a1d24;border-radius:12px;padding:16px;margin:12px 0}
+.badge{display:inline-block;background:#2d9b4e;color:#fff;border-radius:99px;padding:2px 10px;font-size:12px}
+.muted{color:#888;font-size:13px}
+pre{background:#0a0c10;border-radius:8px;padding:12px;font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+button{background:#2d4b9b;color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:14px}
+</style>
+</head>
+<body>
+<h1>AntiMark <span class="badge">v__AM_VERSION__</span></h1>
+<p class="muted">设备标识管理工具 · 正式版</p>
+<div class="card">
+  <div>模块状态：<b id="st">…</b></div>
+  <div class="muted" style="margin-top:6px">本构建仅提供状态查看，不含任何标识修改功能</div>
+</div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <b>隐私清理</b>
+    <button onclick="doClean()">一键清理</button>
+  </div>
+  <div class="muted" style="margin-top:6px">清理系统日志/使用统计/历史记录，不影响设备标识、WiFi 与账户数据</div>
+  <pre id="cleanOut" style="display:none"></pre>
+</div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <b>运行日志</b>
+    <button onclick="loadLog()">刷新</button>
+  </div>
+  <pre id="log">加载中…</pre>
+</div>
+<script>
+async function loadStatus(){
+  try{
+    const r=await fetch('/status');
+    document.getElementById('st').textContent=await r.text();
+  }catch(e){document.getElementById('st').textContent='-';}
+}
+async function loadLog(){
+  try{
+    const r=await fetch('/log');
+    document.getElementById('log').textContent=await r.text();
+  }catch(e){document.getElementById('log').textContent='(无法连接)';}
+}
+async function doClean(){
+  if(!confirm('确认执行隐私清理？'))return;
+  const out=document.getElementById('cleanOut');
+  out.style.display='block';
+  out.textContent='清理中…';
+  try{
+    const r=await fetch('/clean');
+    out.textContent=await r.text();
+  }catch(e){out.textContent='(执行失败)';}
+  loadLog();
+}
+loadStatus();loadLog();
+setInterval(loadStatus,10000);
+</script>
+</body>
+</html>

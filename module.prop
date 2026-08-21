@@ -1,0 +1,7 @@
+id=antimark
+name=AntiMark
+version=v1.0.0
+versionCode=1
+author=ATK12
+description=Device identifier management tool
+webui=1
